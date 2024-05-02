@@ -1,18 +1,37 @@
 'use strict';
-
-// load modules
+/*********************************************************
+ * LOAD MODULES
+*********************************************************/
 const express = require('express');
 const morgan = require('morgan');
+const { sequelize, Course, User } = require('./models');
+const routes = require('./routes');
 
+
+
+
+/*********************************************************
+ * HELPER FUNCTIONS
+*********************************************************/
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
 
 // create the Express app
 const app = express();
 
+// Setup request body JSON parsing.
+app.use(express.json());
+
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
+
+
+
+
+/*********************************************************
+ * ROUTES
+*********************************************************/
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
   res.json({
@@ -20,6 +39,14 @@ app.get('/', (req, res) => {
   });
 });
 
+// Add routes.
+app.use('/api', routes);
+
+
+
+/*********************************************************
+ * ERROR HANDLERS
+*********************************************************/
 // send 404 if no other route matched
 app.use((req, res) => {
   res.status(404).json({
@@ -39,6 +66,54 @@ app.use((err, req, res, next) => {
   });
 });
 
+
+
+
+/*********************************************************
+ * DATABASE CONNECTION
+*********************************************************/
+(async () => {
+
+  // Test the database connection.
+  try {
+    await sequelize.authenticate();
+    console.log('Connection to database has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  };
+
+  // Retrieve courses
+  console.log('Retrieving courses from database');
+  const courses = await Course.findAll({
+    include: [{
+      model: User,
+    }],
+  });
+  console.log(courses.map(course => course.get({ plain: true })));
+
+  // Retrieve users
+  console.log('Retrieving users from database');
+  const user = await User.findAll({
+    include: [{
+      model: Course,
+    }],
+  });
+  console.log(JSON.stringify(user, null, 2));
+
+
+})();
+
+
+
+
+
+
+
+
+
+/*********************************************************
+ * SET PORT AND SERVER
+*********************************************************/
 // set our port
 app.set('port', process.env.PORT || 5000);
 
