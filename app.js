@@ -28,47 +28,6 @@ app.use(morgan('dev'));
 
 
 
-
-/*********************************************************
- * ROUTES
-*********************************************************/
-// setup a friendly greeting for the root route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to the REST API project!',
-  });
-});
-
-// Add routes.
-app.use('/api', routes);
-
-
-
-/*********************************************************
- * ERROR HANDLERS
-*********************************************************/
-// send 404 if no other route matched
-app.use((req, res) => {
-  res.status(404).json({
-    message: 'Route Not Found',
-  });
-});
-
-// setup a global error handler
-app.use((err, req, res, next) => {
-  if (enableGlobalErrorLogging) {
-    console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
-  }
-
-  res.status(err.status || 500).json({
-    message: err.message,
-    error: {},
-  });
-});
-
-
-
-
 /*********************************************************
  * DATABASE CONNECTION
 *********************************************************/
@@ -107,6 +66,42 @@ app.use((err, req, res, next) => {
 
 
 
+/*********************************************************
+ * ROUTES
+*********************************************************/
+// setup a friendly greeting for the root route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome to the REST API project!',
+  });
+});
+
+// Add routes.
+app.use('/api', routes);
+
+
+
+/*********************************************************
+ * ERROR HANDLERS
+*********************************************************/
+// send 404 if no other route matched
+app.use((req, res) => {
+  res.status(404).json({
+    message: 'Route Not Found',
+  });
+});
+
+// setup a global error handler
+app.use((err, req, res, next) => {
+  if (enableGlobalErrorLogging) {
+    console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
+  }
+
+  res.status(err.status || 500).json({
+    message: err.message,
+    error: {},
+  });
+});
 
 
 
