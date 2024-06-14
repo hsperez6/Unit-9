@@ -4,10 +4,8 @@
 *********************************************************/
 const express = require('express');
 const morgan = require('morgan');
-const { sequelize, Course, User } = require('./models');
+const { sequelize, User, Course } = require('./models');
 const routes = require('./routes');
-
-
 
 
 /*********************************************************
@@ -26,17 +24,15 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 
-
-
 /*********************************************************
  * DATABASE CONNECTION
 *********************************************************/
 (async () => {
-
   // Test the database connection.
   try {
     await sequelize.authenticate();
-    console.log('Connection to database has been established successfully.');
+    console.log('Connection to database is successful.');
+    await sequelize.sync();
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   };
@@ -59,10 +55,7 @@ app.use(morgan('dev'));
   });
   console.log(JSON.stringify(user, null, 2));
 
-
 })();
-
-
 
 
 
@@ -102,7 +95,6 @@ app.use((err, req, res, next) => {
     error: {},
   });
 });
-
 
 
 

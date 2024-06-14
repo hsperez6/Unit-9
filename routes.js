@@ -2,9 +2,9 @@
 
 const express = require('express');
 const { asyncHandler } = require('./middleware/async-handler');
+const { authenticateUser } = require('./middleware/auth-user');
 const { User, Course } = require('./models');
-
-// const { authenticateUser } = require('./middleware/auth-user');
+const bcrypt = require('bcryptjs');
 
 // Construct a router instance.
 const router = express.Router();

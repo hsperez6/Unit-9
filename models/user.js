@@ -1,6 +1,6 @@
 'use strict';
 const { Model } = require('sequelize');
-const Sequelize = require('sequelize');
+const bcrypt = require('bcryptjs');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -13,16 +13,65 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
+
   User.init({
     id: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    emailAddress: DataTypes.STRING,
-    password: DataTypes.STRING
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'A first name is required',
+        },
+        notEmpty: {
+          msg: 'Please provide your first name',
+        },
+      },
+    },
+    lastName: { 
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'A last name is required'
+        }, 
+        notEmpty: {
+          msg: 'Please provide your last name'
+        }
+      }
+    },
+    emailAddress:  {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'A valid input is required for email address',
+        },
+        isEmail: {
+          msg: 'Must be a valid email address',
+        },
+      },
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'A valid password is required',
+        },
+        notEmpty: {
+          msg: 'Please provide a password',
+        },
+      },
+      set(val) {
+        const hashedPassword = bcrypt.hashSync(val, 10);
+        this.setDataValue('password', hashedPassword);
+      } 
+    },
   }, {
     sequelize,
     modelName: 'User',
@@ -33,12 +82,11 @@ module.exports = (sequelize, DataTypes) => {
     User.hasMany(models.Course, {
       foreignKey: {
         fieldName: 'userId',
+        allowNull: false,
       },
+      // as: 'courses',
     });
   };
-
-
-
 
   return User;
 };
