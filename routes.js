@@ -10,43 +10,55 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 
-
-
 /*********************************************************
  * USER ROUTES
 *********************************************************/
 // Route returns all properties and values for current authenticated user
-router.get('/users', (req, res) => {
-  res.json({
-    message: 'Welcome to api/users GET Route',
+router.get('/users', authenticateUser, asyncHandler((req, res) => {
+  
+  const user = req.currentUser;
+
+  if (!user) {
+    return res.status(404).json({ message: 'User cannot be found'});
+  }
+  
+  res.status(200).json({
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.emailAddress,  
   });
-});
+
+}));
 
 // Route that creates a new user.
-router.post('/users', asyncHandler(async (req, res) => {
+router.post('/users', asyncHandler( async(req, res) => {
+
   try {
+
     const newUser = await User.create(req.body);
+    console.log(newUser);
     res.status(201).location('/').json({ "message": "Account successfully created!" });
+
   } catch (error) {
-    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+
+    if (error.name === 'SequelizeValidationError') {
+
+      console.error('SequelizeValidationError')
       const errors = error.errors.map(err => err.message);
       res.status(400).json({ errors });   
+
+    } else if (error.name === 'SequelizeUniqueConstraintError') {
+
+      console.error('SequelizeUniqueContraintError')
+      const errors = error.errors.map(err => err.message);
+      res.status(400).json({ errors });   
+
     } else {
       throw error;
     }
-  }
 
-  /**
-    if(req.body.author && req.body.quote){
-      const quote = await records.createQuote({
-        quote: req.body.quote,
-        author: req.body.author
-      });
-      res.status(201).json(quote);
-    } else {
-      res.status(400).json({message: "Quote and author required."});
-    }
-  */
+  }
 
 }));
 

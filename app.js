@@ -47,13 +47,13 @@ app.use(morgan('dev'));
   console.log(courses.map(course => course.get({ plain: true })));
 
   // Retrieve users
-  console.log('Retrieving users from database');
-  const user = await User.findAll({
-    include: [{
-      model: Course,
-    }],
-  });
-  console.log(JSON.stringify(user, null, 2));
+  // console.log('Retrieving users from database');
+  // const user = await User.findAll({
+  //   include: [{
+  //     model: Course,
+  //   }],
+  // });
+  // console.log(JSON.stringify(user, null, 2));
 
 })();
 
