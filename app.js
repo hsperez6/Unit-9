@@ -33,18 +33,19 @@ app.use(morgan('dev'));
     await sequelize.authenticate();
     console.log('Connection to database is successful.');
     await sequelize.sync();
+    console.log('Sequelize models sync successful');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error('Unable to connect and sync to the database:', error);
   };
 
   // Retrieve courses
-  console.log('Retrieving courses from database');
-  const courses = await Course.findAll({
-    include: [{
-      model: User,
-    }],
-  });
-  console.log(courses.map(course => course.get({ plain: true })));
+  // console.log('Retrieving courses from database');
+  // const courses = await Course.findAll({
+  //   include: [{
+  //     model: User,
+  //   }],
+  // });
+  // console.log(courses.map(course => course.get({ plain: true })));
 
   // Retrieve users
   // console.log('Retrieving users from database');

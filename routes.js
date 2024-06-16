@@ -89,29 +89,15 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
   res.status(200).json({ course });
 }));
 
-
-
-
-
-
-
-
 // Route creates a new course, returns 201 
 router.post('/courses', asyncHandler(async (req, res) => {
 
-  // if(req.body.author && req.body.quote){
-  //   const quote = await records.createQuote({
-  //       quote: req.body.quote,
-  //       author: req.body.author
-  //   });
-  //   res.status(201).json(quote);
-  // } else {
-  //   res.status(400).json({message: "Quote and author required."});
-  // }
-
   try {
-    await Course.create(req.body);
-    res.status(201).json({ "message": "Course successfully created!" });
+    const newCourse = await Course.create(req.body);
+    console.log(newCourse);
+    res.status(201).location(`/courses/${newCourse}.id`).json({ "message": "Course successfully created!" });
+    // res.status(201).location('/').json({ "message": "Account successfully created!" });
+
   } catch (error) {
     if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
       const errors = error.errors.map(err => err.message);
@@ -127,17 +113,29 @@ router.post('/courses', asyncHandler(async (req, res) => {
 // Route updates the corresponding course and returns 204
 router.put('/courses/:id', asyncHandler(async (req, res) => {
   
-  const oldCourse = await Course.findByPk(req.params.id);
-  
+  const oldCourse = await Course.findByPk(req.params.id, {
+    include: [{
+      model: User,
+    }],
+  });
+
+
+  const putRequest = req.body
+
+
 
   if(oldCourse){
-      oldCourse.title = req.body.title;
-      oldCourse.description = req.body.description;
-      oldCourse.estimatedTime = req.body.estimatedTime;
-      oldCourse.materialsNeeded = req.body.materialsNeeded; 
+      // oldCourse.title = req.body.title;
+      // oldCourse.description = req.body.description;
+      // oldCourse.estimatedTime = req.body.estimatedTime;
+      // oldCourse.materialsNeeded = req.body.materialsNeeded; 
 
       // await course.updateQuote(quote);
-      res.status(204).end();
+
+      console.log(oldCourse);
+      console.log(putRequest);
+
+      res.status(204).json(oldCourse, putRequest);
   } else {
       res.status(404).json({message: "Quote Not Found"});
   }
