@@ -9,37 +9,29 @@ const bcrypt = require('bcryptjs');
 // Construct a router instance.
 const router = express.Router();
 
-
 /*********************************************************
  * USER ROUTES
 *********************************************************/
 // Route returns all properties and values for current authenticated user
 router.get('/users', authenticateUser, asyncHandler((req, res) => {
-  
   const user = req.currentUser;
-
   if (!user) {
     return res.status(404).json({ message: 'User cannot be found'});
-  }
-  
+  };  
   res.status(200).json({
     id: user.id,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.emailAddress,  
   });
-
 }));
 
 // Route that creates a new user.
 router.post('/users', asyncHandler( async(req, res) => {
-
   try {
-
     const newUser = await User.create(req.body);
     console.log(newUser);
     res.status(201).location('/').json({ "message": "Account successfully created!" });
-
   } catch (error) {
 
     if (error.name === 'SequelizeValidationError') {
@@ -96,7 +88,6 @@ router.post('/courses', asyncHandler(async (req, res) => {
     const newCourse = await Course.create(req.body);
     console.log(newCourse);
     res.status(201).location(`/courses/${newCourse}.id`).json({ "message": "Course successfully created!" });
-    // res.status(201).location('/').json({ "message": "Account successfully created!" });
 
   } catch (error) {
     if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
@@ -109,43 +100,57 @@ router.post('/courses', asyncHandler(async (req, res) => {
 
 }));
 
-
 // Route updates the corresponding course and returns 204
 router.put('/courses/:id', asyncHandler(async (req, res) => {
-  
+
+  const putRequest = req.body
+  // console.log(putRequest);
+
   const oldCourse = await Course.findByPk(req.params.id, {
     include: [{
       model: User,
     }],
   });
 
-
-  const putRequest = req.body
-
-
+  // console.log(oldCourse);
 
   if(oldCourse){
-      // oldCourse.title = req.body.title;
-      // oldCourse.description = req.body.description;
-      // oldCourse.estimatedTime = req.body.estimatedTime;
-      // oldCourse.materialsNeeded = req.body.materialsNeeded; 
 
-      // await course.updateQuote(quote);
+    const updatedCourse = await oldCourse.update({
+      title: putRequest.title,
+      description: putRequest.description,
+      estimatedTime: putRequest.estimatedTime,
+      materialsNeeded: putRequest.materialsNeeded,
+      userId: putRequest.userId
+    });
 
-      console.log(oldCourse);
-      console.log(putRequest);
+    console.log(updatedCourse.get({ plain: true }))
 
-      res.status(204).json(oldCourse, putRequest);
+
+
+    // res.status(204).json(oldCourse);
+    res.status(203).json({ updatedCourse });
+
   } else {
       res.status(404).json({message: "Quote Not Found"});
   }
 
-
-
-
-
-
 }));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Route deletes corresponding course and returns 204
 router.delete('/courses/:id', asyncHandler(async (req, res) => {
