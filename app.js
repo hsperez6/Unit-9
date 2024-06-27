@@ -20,7 +20,7 @@ const app = express();
 // Setup request body JSON parsing.
 app.use(express.json());
 
-// setup morgan which gives us http request logging
+// setup morgan 
 app.use(morgan('dev'));
 
 
@@ -38,26 +38,7 @@ app.use(morgan('dev'));
     console.error('Unable to connect and sync to the database:', error);
   };
 
-  // Retrieve courses
-  // console.log('Retrieving courses from database');
-  // const courses = await Course.findAll({
-  //   include: [{
-  //     model: User,
-  //   }],
-  // });
-  // console.log(courses.map(course => course.get({ plain: true })));
-
-  // Retrieve users
-  // console.log('Retrieving users from database');
-  // const user = await User.findAll({
-  //   include: [{
-  //     model: Course,
-  //   }],
-  // });
-  // console.log(JSON.stringify(user, null, 2));
-
 })();
-
 
 
 /*********************************************************
@@ -74,7 +55,6 @@ app.get('/', (req, res) => {
 app.use('/api', routes);
 
 
-
 /*********************************************************
  * ERROR HANDLERS
 *********************************************************/
@@ -89,14 +69,12 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   if (enableGlobalErrorLogging) {
     console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
-  }
-
+  };
   res.status(err.status || 500).json({
     message: err.message,
     error: {},
   });
 });
-
 
 
 /*********************************************************
