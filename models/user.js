@@ -60,7 +60,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       set(val) {
-
+        // If password is not null or empty, hash the password and set the value
         if (val.length > 0 && val !== null) {          
           const hashedPassword = bcrypt.hashSync(val, 10);
           this.setDataValue('password', hashedPassword);
@@ -82,7 +82,7 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'User',
   });
 
-
+  // Model Associations
   User.associate = (models) => {
     User.hasMany(models.Course, {
       foreignKey: {

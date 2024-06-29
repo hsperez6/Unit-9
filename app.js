@@ -58,14 +58,14 @@ app.use('/api', routes);
 /*********************************************************
  * ERROR HANDLERS
 *********************************************************/
-// send 404 if no other route matched
+// 404 Error Handler
 app.use((req, res) => {
   res.status(404).json({
     message: 'Route Not Found',
   });
 });
 
-// setup a global error handler
+// Global Error Handler
 app.use((err, req, res, next) => {
   if (enableGlobalErrorLogging) {
     console.error(`Global error handler: ${JSON.stringify(err.stack)}`);

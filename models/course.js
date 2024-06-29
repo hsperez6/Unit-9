@@ -48,14 +48,13 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Course',
   });
 
-
+  // Model associations
   Course.associate = (models) => {
     Course.belongsTo(models.User, {
       foreignKey: {
         fieldName: 'userId',
         allowNull: false,
       },
-      // as: 'user',
     });
   };
 
