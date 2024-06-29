@@ -46,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     emailAddress:  {
       type: DataTypes.STRING,
+      // Checks if email account used for creating a new user is not already in the db
+      unique: {
+        msg: "An account for this email already exists."
+      },
       allowNull: false,
       validate: {
         notNull: {

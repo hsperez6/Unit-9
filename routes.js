@@ -12,9 +12,11 @@ const bcrypt = require('bcryptjs');
 // Construct a router instance.
 const router = express.Router();
 
+
 /*********************************************************
  * USER ROUTES
 *********************************************************/
+
 /** GET - Route returns all properties and values for current authenticated user*/
 router.get('/users', authenticateUser, asyncHandler((req, res) => {
   // If authentication passes, save the currentUser from the request body to the variable "user"
@@ -61,34 +63,94 @@ router.post('/users', asyncHandler( async(req, res) => {
 }));
 
 
-
 /*********************************************************
  * COURSE ROUTES
 *********************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /** GET - Route returns all courses including User object associated with each course and 200*/
 router.get('/courses', asyncHandler(async (req, res) => {
   // Retrieve courses, including user model
   const courses = await Course.findAll({
+    // Filters out 'createdAt' and 'updatedAt' properties from the response
+    attributes: ["id", "title", "description", "estimatedTime", "materialsNeeded", "userId" ],
     include: [{
       model: User,
+      // Filters out 'createdAt', 'updatedAt', and 'password' properties from the response
+      attributes: ["id", "firstName", "lastName", "emailAddress"]
     }],
+
   });
   // Respond with list of all courses and 200 Status
   res.status(200).json({ courses });
 }));
 
+
+
+
+
+
+
 /** GET - Route returns corresponding course including asscociated User object and 200*/ 
 router.get('/courses/:id', asyncHandler(async (req, res) => {
   // Find course using the request parameter "id", include user model
   const course = await Course.findByPk(req.params.id, {
+    // Filters out 'createdAt' and 'updatedAt' properties from the response
+    attributes: ["id", "title", "description", "estimatedTime", "materialsNeeded", "userId" ],
     include: [{
       model: User,
+      // Filters out 'createdAt', 'updatedAt', and 'password' properties from the response
+      attributes: ["id", "firstName", "lastName", "emailAddress"]
     }],
   });
   console.log(course);
   // Response with course information and 200 Status
   res.status(200).json({ course });
 }));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /** POST - Route creates a new course, returns 201*/  
 router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
