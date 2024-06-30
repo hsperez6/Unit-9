@@ -67,30 +67,6 @@ router.post('/users', asyncHandler( async(req, res) => {
  * COURSE ROUTES
 *********************************************************/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /** GET - Route returns all courses including User object associated with each course and 200*/
 router.get('/courses', asyncHandler(async (req, res) => {
   // Retrieve courses, including user model
@@ -109,11 +85,6 @@ router.get('/courses', asyncHandler(async (req, res) => {
 }));
 
 
-
-
-
-
-
 /** GET - Route returns corresponding course including asscociated User object and 200*/ 
 router.get('/courses/:id', asyncHandler(async (req, res) => {
   // Find course using the request parameter "id", include user model
@@ -130,26 +101,6 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
   // Response with course information and 200 Status
   res.status(200).json({ course });
 }));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /** POST - Route creates a new course, returns 201*/  
@@ -177,12 +128,25 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
   };
 }));
 
+
+
+
+
+
+
+
+
+
+
+
 /** PUT - Route updates the corresponding course and returns 204*/ 
 router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
 
   // Extract data from req.body and save to variable putRequest
-  const putRequest = req.body
-
+  const putRequest = req.body;
+  // const putRequestId = putRequest.userId;
+  // console.log(putRequestId);
+ 
   // Find course in the db using request paramater "id", include user model
   const oldCourse = await Course.findByPk(req.params.id, {
     include: [{
@@ -190,27 +154,58 @@ router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
     }],
   });
 
+      // If authentication passes, save the currentUser from the request body to the variable "user"
+  // const user = req.currentUser;
+  console.log(`This is the authenticated user id: ${req.currentUser.id}`);
+  // const userId = user.id;
+
+  console.log(`This is the id of the owner of the course from the database: ${oldCourse.userId}`);
+
+  // if (user) {
+  //   const authenticated = bcrypt.compareSync(credentials.pass, user.password);
+  // }
+
   // If a course is found in the db, update the course using .update() method on Course model
   if(oldCourse){
-    const updatedCourse = await oldCourse.update({
-      title: putRequest.title,
-      description: putRequest.description,
-      estimatedTime: putRequest.estimatedTime,
-      materialsNeeded: putRequest.materialsNeeded,
-      userId: putRequest.userId
-    });
+
+    if(req.currentUser.id === oldCourse.userId) {
+
+      const updatedCourse = await oldCourse.update({
+        title: putRequest.title,
+        description: putRequest.description,
+        estimatedTime: putRequest.estimatedTime,
+        materialsNeeded: putRequest.materialsNeeded,
+        userId: putRequest.userId
+      });
+
+      console.log("The course was successfully updated")
+
+      // Respond with 204 Status and no content
+      res.status(202).json({updatedCourse});
+
+    } else {
+      
+      console.log("Error in trying to edit course with no ownership")
+      res.status(403).json({message: "You are not the owner of the course. You can only change courses you own."});
+
+    };
 
     // Log updated course to Terminal
-    console.log(updatedCourse.get({ plain: true }));
-
-    // Respond with 204 Status and no content
-    res.status(204).json();
+    // console.log(updatedCourse.get({ plain: true }));
 
   } else {
+
     // If no course is found in db, respond with 404 Status and "Course Not Found" message
     res.status(404).json({message: "Course Not Found"});
+
   }
 }));
+
+
+
+
+
+
 
 /** DELETE - Route deletes corresponding course and returns 204*/ 
 router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
