@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         notNull: {
-          msg: 'A valid input is required for Title',
+          msg: 'A valid input is required for title',
         },
         notEmpty: {
           msg: 'A title is required',

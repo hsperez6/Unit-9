@@ -69,7 +69,6 @@ module.exports = (sequelize, DataTypes) => {
           const hashedPassword = bcrypt.hashSync(val, 10);
           this.setDataValue('password', hashedPassword);
         }
-
       }, 
       validate: {
         notNull: {
